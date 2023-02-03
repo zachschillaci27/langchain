@@ -1,4 +1,5 @@
 # flake8: noqa
+from langchain.prompts.base import CodeOutputParser
 from langchain.prompts.prompt import PromptTemplate
 
 _DEFAULT_TEMPLATE = """Given an input question, create syntactically correct Python code to run using the Pandas framework.
@@ -18,6 +19,7 @@ Code: """
 PROMPT = PromptTemplate(
     input_variables=["input", "column_names"],
     template=_DEFAULT_TEMPLATE,
+    output_parser=CodeOutputParser(),
 )
 
 _PLOT_TEMPLATE = """Convert the following Pandas DataFrame plot to Plotly Express. Consider the following examples for reference:    
@@ -36,4 +38,5 @@ Plotly: """
 PLOT_PROMPT = PromptTemplate(
     input_variables=["input"],
     template=_PLOT_TEMPLATE,
+    output_parser=CodeOutputParser(),
 )
