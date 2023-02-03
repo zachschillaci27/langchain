@@ -110,6 +110,14 @@ class RegexParser(BaseOutputParser, BaseModel):
                 }
 
 
+class CodeOutputParser(BaseOutputParser):
+    """Class to parse the output of an LLM call to a code snippet."""
+
+    def parse(self, text: str) -> str:
+        """Parse the output of an LLM call."""
+        return text.strip()
+
+
 class BasePromptTemplate(BaseModel, ABC):
     """Base prompt should expose the format method, returning a prompt."""
 

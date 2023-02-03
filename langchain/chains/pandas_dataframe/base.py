@@ -87,14 +87,14 @@ class PandasDataFrameChain(Chain, BaseModel):
             "column_names": self.dataframe.columns.to_list(),
             "stop": ["\nCode:"],
         }
-        code = llm_chain.predict(**llm_inputs).strip()
+        code = llm_chain.predict_and_parse(**llm_inputs)
         if ".plot" in code:
             plot_chain = LLMChain(llm=self.llm, prompt=self.plot_prompt)
             llm_inputs = {
                 "input": code,
                 "stop": ["\nPlotly:"],
             }
-            code = plot_chain.predict(**llm_inputs).strip()
+            code = plot_chain.predict_and_parse(**llm_inputs)
         self.callback_manager.on_text("\nCode: ", verbose=self.verbose)
         self.callback_manager.on_text(code, color="yellow", verbose=self.verbose)
         result = _evaluate_code(code, df=self.dataframe)
