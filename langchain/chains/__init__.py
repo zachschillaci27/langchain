@@ -11,6 +11,7 @@ from langchain.chains.loading import load_chain
 from langchain.chains.mapreduce import MapReduceChain
 from langchain.chains.moderation import OpenAIModerationChain
 from langchain.chains.pal.base import PALChain
+from langchain.chains.pandas_dataframe.base import PandasDataFrameChain
 from langchain.chains.qa_with_sources.base import QAWithSourcesChain
 from langchain.chains.qa_with_sources.vector_db import VectorDBQAWithSourcesChain
 from langchain.chains.sequential import SequentialChain, SimpleSequentialChain
@@ -28,6 +29,7 @@ __all__ = [
     "LLMCheckerChain",
     "LLMMathChain",
     "PALChain",
+    "PandasDataFrameChain",
     "QAWithSourcesChain",
     "SQLDatabaseChain",
     "SequentialChain",
