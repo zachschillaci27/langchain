@@ -2,7 +2,8 @@
 from langchain.prompts.base import CodeOutputParser
 from langchain.prompts.prompt import PromptTemplate
 
-_DEFAULT_TEMPLATE = """Given an input question, create syntactically correct Python code to run using the Pandas framework.
+_DEFAULT_TEMPLATE = """Given an input question, create syntactically correct Python code to run using the Pandas framework. 
+
 Respond only in executable Python code using the following format:
 
 Question: "Question here"
@@ -22,15 +23,21 @@ PROMPT = PromptTemplate(
     output_parser=CodeOutputParser(),
 )
 
-_PLOT_TEMPLATE = """Convert the following Pandas DataFrame plot to Plotly Express. Consider the following examples for reference:    
+_PLOT_TEMPLATE = """Convert the following Pandas DataFrame plot to Plotly Express.
 
-# Examples:
+Here are some examples:
+
+EXAMPLE 1:
+==================================================
 Pandas: df.groupby('x')['y'].mean(numeric_only=True).plot(kind="bar")
 Plotly: px.bar(df.groupby("x").mean(numeric_only=True).reset_index(), x="x", y="y", barmode="group")
+==================================================
 
+EXAMPLE 2:
+==================================================
 Pandas: df.groupby('x')['y'].sum(numeric_only=True).plot(kind="scatter", color="z")
 Plotly: px.scatter(df.groupby("x").sum(numeric_only=True).reset_index(), x="x", y="y", color="z")
-#
+==================================================
 
 Pandas: {input}
 Plotly: """
