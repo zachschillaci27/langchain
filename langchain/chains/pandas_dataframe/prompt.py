@@ -29,13 +29,13 @@ Here are some examples:
 
 EXAMPLE 1:
 ==================================================
-Pandas: df.groupby('x')['y'].mean(numeric_only=True).plot(kind="bar")
+Pandas: df.groupby("x")["y"].mean(numeric_only=True).plot(kind="bar")
 Plotly: px.bar(df.groupby("x").mean(numeric_only=True).reset_index(), x="x", y="y", barmode="group")
 ==================================================
 
 EXAMPLE 2:
 ==================================================
-Pandas: df.groupby('x')['y'].sum(numeric_only=True).plot(kind="scatter", color="z")
+Pandas: df.groupby("x")["y"].sum(numeric_only=True).plot(kind="scatter", color="z")
 Plotly: px.scatter(df.groupby("x").sum(numeric_only=True).reset_index(), x="x", y="y", color="z")
 ==================================================
 
