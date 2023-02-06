@@ -9,7 +9,7 @@ from pydantic import BaseModel, Extra, Field
 
 from langchain.chains.base import Chain
 from langchain.chains.llm import LLMChain
-from langchain.chains.pandas_dataframe.prompt import PLOT_PROMPT, PROMPT
+from langchain.chains.pandas_dataframe.prompt import PANDAS_PROMPT, PLOT_PROMPT
 from langchain.llms.base import BaseLLM
 from langchain.prompts.base import BasePromptTemplate
 
@@ -32,6 +32,10 @@ def _evaluate_code(code: str, df: DataFrame = None) -> Any:
         return e
 
 
+def _code_contains_pandas_plot(code: str) -> bool:
+    return ".plot" in code
+
+
 class PandasDataFrameChain(Chain, BaseModel):
     """Chain for interacting with a Pandas DataFrame.
 
@@ -42,17 +46,15 @@ class PandasDataFrameChain(Chain, BaseModel):
             df_chain = PandasDataFrameChain(llm=OpenAI(), dataframe=df)
     """
 
-    llm: BaseLLM
-    """LLM wrapper to use."""
     dataframe: DataFrame = Field(exclude=True)
-    """Pandas DataFrame to connect to."""
-    prompt: BasePromptTemplate = PROMPT
-    """Prompt to use to translate natural language to Pandas."""
-    plot_prompt: BasePromptTemplate = PLOT_PROMPT
-    """Prompt to use to translate Pandas plots to Plotly."""
+    """Pandas DataFrame to use."""
+    pandas_generator: LLMChain
+    """Pandas chain to generate executable Pandas code."""
+    plot_generator: LLMChain
+    """Plot chain to generate interactive Plotly figures."""
+    code_key: str = "code"
     input_key: str = "query"  #: :meta private:
     output_key: str = "result"  #: :meta private:
-    code_key: str = "code"  #: :meta private:
 
     class Config:
         """Configuration for this pydantic object."""
@@ -76,28 +78,46 @@ class PandasDataFrameChain(Chain, BaseModel):
         """
         return [self.code_key, self.output_key]
 
+    @classmethod
+    def from_llm(
+        cls,
+        llm: BaseLLM,
+        dataframe: DataFrame,
+        pandas_prompt: BasePromptTemplate = PANDAS_PROMPT,
+        plot_prompt: BasePromptTemplate = PLOT_PROMPT,
+        verbose: bool = False,
+    ) -> PandasDataFrameChain:
+        return cls(
+            dataframe=dataframe,
+            pandas_generator=LLMChain(llm=llm, prompt=pandas_prompt),
+            plot_generator=LLMChain(llm=llm, prompt=plot_prompt),
+            verbose=verbose,
+        )
+
     def _call(self, inputs: Dict[str, Any]) -> Dict[str, str]:
-        llm_chain = LLMChain(llm=self.llm, prompt=self.prompt)
         self.callback_manager.on_text("Question: ", verbose=self.verbose)
         self.callback_manager.on_text(
             inputs[self.input_key], color="blue", verbose=self.verbose
         )
         llm_inputs = {
             "input": inputs[self.input_key],
-            "column_names": self.dataframe.columns.to_list(),
+            "column_names_and_types": str(self.dataframe.dtypes),
             "stop": ["\nCode:"],
         }
-        code = llm_chain.predict_and_parse(**llm_inputs)
-        if ".plot" in code:
-            plot_chain = LLMChain(llm=self.llm, prompt=self.plot_prompt)
+        # Store all LLM-generated code responses in a list
+        code = [self.pandas_generator.predict_and_parse(**llm_inputs)]
+        # Check if this output is a Pandas DataFrame plot, if so
+        # run the Plotly chain to translate it.
+        if _code_contains_pandas_plot(code[-1]):
             llm_inputs = {
-                "input": code,
+                "input": code[-1],
                 "stop": ["\nPlotly:"],
             }
-            code = plot_chain.predict_and_parse(**llm_inputs)
+            code.append(self.plot_generator.predict_and_parse(**llm_inputs))
         self.callback_manager.on_text("\nCode: ", verbose=self.verbose)
-        self.callback_manager.on_text(code, color="yellow", verbose=self.verbose)
-        result = _evaluate_code(code, df=self.dataframe)
+        self.callback_manager.on_text(code[-1], color="yellow", verbose=self.verbose)
+        # Evaluate the code and a handle common exceptions automatically
+        result = _evaluate_code(code[-1], df=self.dataframe)
         if isinstance(result, Exception):
             self.callback_manager.on_text("\nResult: ", verbose=self.verbose)
             self.callback_manager.on_text(
