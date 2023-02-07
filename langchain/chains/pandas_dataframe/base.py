@@ -15,7 +15,9 @@ from langchain.prompts.base import BasePromptTemplate
 
 
 def _evaluate_code(code: str, df: DataFrame = None) -> Any:
-    # Import common libraries
+    # Import common libraries that are likely to be used
+    # in the machine-generated code. These should follow
+    # the most frequently used aliases.
     from datetime import datetime, timedelta  # noqa: F401
 
     import numpy as np  # noqa: F401
