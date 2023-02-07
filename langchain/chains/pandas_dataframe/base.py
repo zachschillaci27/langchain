@@ -18,7 +18,6 @@ def _evaluate_code(code: str, df: DataFrame = None) -> Any:
     # Import common libraries
     from datetime import datetime, timedelta  # noqa: F401
 
-    import matplotlib.pyplot as plt  # noqa: F401
     import numpy as np  # noqa: F401
     import pandas as pd  # noqa: F401
     import plotly.express as px  # noqa: F401
