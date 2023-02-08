@@ -3,7 +3,6 @@ from __future__ import annotations
 
 from typing import Any, Dict, List
 
-from matplotlib.axes import Axes
 from pandas import DataFrame
 from pydantic import BaseModel, Extra, Field
 
@@ -22,7 +21,14 @@ def _evaluate_code(code: str, df: DataFrame = None) -> Any:
 
     import numpy as np  # noqa: F401
     import pandas as pd  # noqa: F401
-    import plotly.express as px  # noqa: F401
+
+    if _code_contains_plotly_plot(code):
+        try:
+            import plotly.express as px  # noqa: F401
+        except ImportError:
+            raise ImportError(
+                "Plotly is not installed. Please install it with `pip install plotly`."
+            )
 
     try:
         try:
@@ -35,6 +41,10 @@ def _evaluate_code(code: str, df: DataFrame = None) -> Any:
 
 def _code_contains_pandas_plot(code: str) -> bool:
     return ".plot" in code
+
+
+def _code_contains_plotly_plot(code: str) -> bool:
+    return "px." in code
 
 
 class PandasDataFrameChain(Chain, BaseModel):
@@ -122,7 +132,9 @@ class PandasDataFrameChain(Chain, BaseModel):
         if isinstance(result, Exception):
             self.callback_manager.on_text("\nResult: ", verbose=self.verbose)
             self.callback_manager.on_text(
-                result.__class__.__name__, color="pink", verbose=self.verbose
+                f"""{result.__class__.__name__}: {result}.""",
+                color="pink",
+                verbose=self.verbose,
             )
         else:
             self.callback_manager.on_text("\nResult: ", verbose=self.verbose)
