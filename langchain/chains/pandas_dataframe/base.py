@@ -1,7 +1,7 @@
 """Chain for interacting with Pandas DataFrame."""
 from __future__ import annotations
 
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from pandas import DataFrame
 from pydantic import BaseModel, Extra, Field
@@ -13,7 +13,7 @@ from langchain.llms.base import BaseLLM
 from langchain.prompts.base import BasePromptTemplate
 
 
-def _evaluate_code(code: str, df: DataFrame = None) -> Any:
+def _evaluate_code(code: str, df: Optional[DataFrame] = None) -> Any:
     # Import common libraries that are likely to be used
     # in the machine-generated code. These should follow
     # the most frequently used aliases.
@@ -105,7 +105,7 @@ class PandasDataFrameChain(Chain, BaseModel):
             verbose=verbose,
         )
 
-    def _call(self, inputs: Dict[str, Any]) -> Dict[str, str]:
+    def _call(self, inputs: Dict[str, Any]) -> Dict[str, Any]:
         self.callback_manager.on_text("Question: ", verbose=self.verbose)
         self.callback_manager.on_text(
             inputs[self.input_key], color="blue", verbose=self.verbose
