@@ -95,7 +95,6 @@ class SQLDatabase:
 
         tables = []
         for table_name in all_table_names:
-            columns = []
             create_table = self.run(
                 (
                     "SELECT sql FROM sqlite_master WHERE "
@@ -104,8 +103,12 @@ class SQLDatabase:
                 fetch="one",
             )
 
-            for column in self._inspector.get_columns(table_name, schema=self._schema):
-                columns.append(column["name"])
+            columns = [
+                column["name"]
+                for column in self._inspector.get_columns(
+                    table_name, schema=self._schema
+                )
+            ]
 
             if self._sample_rows_in_table_info:
                 select_star = (
