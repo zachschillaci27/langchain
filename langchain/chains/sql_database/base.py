@@ -35,6 +35,7 @@ class SQLDatabaseChain(Chain, BaseModel):
     input_key: str = "query"  #: :meta private:
     output_key: str = "result"  #: :meta private:
     return_intermediate_steps: bool = False
+    return_direct: bool = False
 
     class Config:
         """Configuration for this pydantic object."""
@@ -77,6 +78,8 @@ class SQLDatabaseChain(Chain, BaseModel):
         }
         intermediate_steps = []
         sql_cmd = llm_chain.predict(**llm_inputs)
+        if self.return_direct:
+            return {self.output_key: sql_cmd}
         intermediate_steps.append(sql_cmd)
         self.callback_manager.on_text(sql_cmd, color="green", verbose=self.verbose)
         result = self.database.run(sql_cmd)
