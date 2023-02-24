@@ -25,13 +25,17 @@ from langchain.chains import (
 from langchain.docstore import InMemoryDocstore, Wikipedia
 from langchain.llms import (
     Anthropic,
+    Banana,
     CerebriumAI,
     Cohere,
     ForefrontAI,
     GooseAI,
     HuggingFaceHub,
+    Modal,
     OpenAI,
     Petals,
+    StochasticAI,
+    Writer,
 )
 from langchain.llms.huggingface_pipeline import HuggingFacePipeline
 from langchain.prompts import (
@@ -68,12 +72,16 @@ __all__ = [
     "GoogleSerperAPIWrapper",
     "WolframAlphaAPIWrapper",
     "Anthropic",
+    "Banana",
     "CerebriumAI",
     "Cohere",
     "ForefrontAI",
     "GooseAI",
+    "Modal",
     "OpenAI",
     "Petals",
+    "StochasticAI",
+    "Writer",
     "BasePromptTemplate",
     "Prompt",
     "FewShotPromptTemplate",
