@@ -48,7 +48,6 @@ class SerpAPIWrapper(BaseModel):
             serpapi = SerpAPIWrapper()
     """
 
-    return_organic_results: bool = False
     search_engine: Any  #: :meta private:
     params: dict = Field(default_factory=_get_default_params)
     serpapi_api_key: Optional[str] = None
@@ -76,7 +75,7 @@ class SerpAPIWrapper(BaseModel):
             )
         return values
 
-    def run(self, query: str) -> str:
+    def run(self, query: str, return_organic_results: bool = False) -> str:
         """Run query through SerpAPI and parse result."""
         _params = {
             "api_key": self.serpapi_api_key,
@@ -89,7 +88,7 @@ class SerpAPIWrapper(BaseModel):
         if "error" in res.keys():
             raise ValueError(f"Got error from SerpAPI: {res['error']}")
 
-        if self.return_organic_results:
+        if return_organic_results:
             if "organic_results" in res.keys():
                 return "\n\n".join(
                     [
