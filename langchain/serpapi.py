@@ -93,7 +93,7 @@ class SerpAPIWrapper(BaseModel):
             if "organic_results" in res.keys():
                 return "\n\n".join(
                     [
-                        f"* Title: {r['title']} \n   * Snippet: {r['snippet']}"
+                        f"* Title: {r.get('title')} \n   * Snippet: {r.get('snippet')}"
                         for r in res["organic_results"]
                     ]
                 )
