@@ -50,8 +50,8 @@ class SerpAPIWrapper(BaseModel):
 
     search_engine: Any  #: :meta private:
     params: dict = Field(default_factory=_get_default_params)
-    serpapi_api_key: Optional[str] = None
     return_organic_results: bool = False
+    serpapi_api_key: Optional[str] = None
 
     class Config:
         """Configuration for this pydantic object."""
