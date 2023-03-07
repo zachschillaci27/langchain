@@ -48,9 +48,9 @@ class SerpAPIWrapper(BaseModel):
             serpapi = SerpAPIWrapper()
     """
 
+    return_organic_results: bool = False
     search_engine: Any  #: :meta private:
     params: dict = Field(default_factory=_get_default_params)
-    return_organic_results: bool = False
     serpapi_api_key: Optional[str] = None
 
     class Config:
