@@ -51,6 +51,7 @@ class SerpAPIWrapper(BaseModel):
     search_engine: Any  #: :meta private:
     params: dict = Field(default_factory=_get_default_params)
     serpapi_api_key: Optional[str] = None
+    return_organic_results: bool = False
 
     class Config:
         """Configuration for this pydantic object."""
@@ -75,7 +76,7 @@ class SerpAPIWrapper(BaseModel):
             )
         return values
 
-    def run(self, query: str, return_organic_results: bool = False) -> str:
+    def run(self, query: str) -> str:
         """Run query through SerpAPI and parse result."""
         _params = {
             "api_key": self.serpapi_api_key,
@@ -88,7 +89,7 @@ class SerpAPIWrapper(BaseModel):
         if "error" in res.keys():
             raise ValueError(f"Got error from SerpAPI: {res['error']}")
 
-        if return_organic_results:
+        if self.return_organic_results:
             if "organic_results" in res.keys():
                 return "\n\n".join(
                     [
