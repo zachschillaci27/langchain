@@ -51,6 +51,7 @@ class SerpAPIWrapper(BaseModel):
     search_engine: Any  #: :meta private:
     params: dict = Field(default_factory=_get_default_params)
     serpapi_api_key: Optional[str] = None
+    return_organic_results: bool = False
 
     class Config:
         """Configuration for this pydantic object."""
@@ -87,6 +88,16 @@ class SerpAPIWrapper(BaseModel):
             res = search.get_dict()
         if "error" in res.keys():
             raise ValueError(f"Got error from SerpAPI: {res['error']}")
+
+        if self.return_organic_results:
+            if "organic_results" in res.keys():
+                return "\n\n".join(
+                    [
+                        f"* Title: {r['title']} \n   * Snippet: {r['snippet']}"
+                        for r in res["organic_results"]
+                    ]
+                )
+
         if "answer_box" in res.keys() and "answer" in res["answer_box"].keys():
             toret = res["answer_box"]["answer"]
         elif "answer_box" in res.keys() and "snippet" in res["answer_box"].keys():
@@ -108,7 +119,6 @@ class SerpAPIWrapper(BaseModel):
             toret = res["knowledge_graph"]["description"]
         elif "snippet" in res["organic_results"][0].keys():
             toret = res["organic_results"][0]["snippet"]
-
         else:
             toret = "No good search result found"
         return toret
