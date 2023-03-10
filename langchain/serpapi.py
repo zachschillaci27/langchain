@@ -56,7 +56,7 @@ class SerpAPIWrapper(BaseModel):
     class Config:
         """Configuration for this pydantic object."""
 
-        extra = Extra.forbid
+        extra = Extra.allow
 
     @root_validator()
     def validate_environment(cls, values: Dict) -> Dict:
@@ -93,7 +93,12 @@ class SerpAPIWrapper(BaseModel):
             if "organic_results" in res.keys():
                 return "\n\n".join(
                     [
-                        f"* Title: {r.get('title')} \n   * Snippet: {r.get('snippet')}"
+                        " \n   * ".join(
+                            [
+                                f"{field.title()}: {r.get(field)}"
+                                for field in ["title", "snippet", "link"]
+                            ]
+                        )
                         for r in res["organic_results"]
                     ]
                 )
